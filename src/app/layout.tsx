@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Navbar from "./components/navigation/Navbar";
+import Footer from "./components/navigation/Footer";
 
 export const metadata: Metadata = {
   title: "NHL Stats App",
@@ -19,6 +20,7 @@ export default function RootLayout({
       >
         <Navbar />
         {children}
+        <Footer />
       </body>
     </html>
   );
