@@ -10,7 +10,7 @@ export default function Footer() {
   ];
 
   return (
-    <footer className="bg-gray-900 text-white px-4 py-8 fixed bottom-0 w-full">
+    <footer className="bg-gray-900 text-white px-4 py-8 mx-auto w-full">
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
         <div>
           <h2 className="text-lg font-bold mb-4">NHL Stats App</h2>
