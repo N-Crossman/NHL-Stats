@@ -1,9 +1,12 @@
 "use client";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 
 interface TeamInfo {
   name: string;
   score: number;
+  logo: string;
+  darkLogo: string;
 }
 
 interface GameInfo {
@@ -20,10 +23,14 @@ interface NHLApiGame {
     homeTeam: {
         name: string;
         score: number;
+        logo?: string;
+        darkLogo?: string;
     };
     awayTeam: {
         name: string;
         score: number;
+        logo?: string;
+        darkLogo?: string;
     };
     status: string;
 }
@@ -72,10 +79,12 @@ export default function Scoreboard() {
             homeTeam: {
               name: game.homeTeam.name,
               score: game.homeTeam.score,
+              logo: game.homeTeam.darkLogo || game.homeTeam.logo || '',
             },
             awayTeam: {
               name: game.awayTeam.name,
               score: game.awayTeam.score,
+              logo: game.awayTeam.darkLogo || game.awayTeam.logo || '',
             },
             status: formatGameStatus(game.status),
             localTime,
@@ -97,10 +106,10 @@ export default function Scoreboard() {
   if (error) return <p className="text-center mt-4 text-red-500">{error}</p>;
   if (loading) return <p className="text-center mt-4">Loading today&rsquo;s games...</p>;
 
-  return (
+   return (
     <div className="w-full p-4 sm:p-6">
       <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-2xl shadow-2xl p-4 sm:p-6 max-w-6xl mx-auto backdrop-blur-sm border border-slate-700/50">
-        <h2 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 text-center bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-white">
+        <h2 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 text-center bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
           NHL Scoreboard
         </h2>
         {games.length === 0 ? (
@@ -113,10 +122,23 @@ export default function Scoreboard() {
                 className="bg-slate-800/60 backdrop-blur-md border border-slate-700/50 rounded-xl p-3 sm:p-4 shadow-lg hover:shadow-xl hover:border-slate-600 transition-all duration-300 hover:scale-[1.02]"
               >
                 <div className="flex justify-between items-center mb-2">
-                  <p className="font-semibold text-sm sm:text-base text-slate-100">
-                    {game.awayTeam.name}
-                  </p>
-                  <p className="text-xl sm:text-2xl font-bold text-white">
+                  <div className="flex items-center gap-2 sm:gap-3 flex-1">
+                    {game.awayTeam.logo && (
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 flex-shrink-0">
+                        <Image
+                          src={game.awayTeam.logo}
+                          alt={`${game.awayTeam.name} logo`}
+                          width={40}
+                          height={40}
+                          className="object-contain w-full h-full"
+                        />
+                      </div>
+                    )}
+                    <p className="font-semibold text-sm sm:text-base text-slate-100">
+                      {game.awayTeam.name}
+                    </p>
+                  </div>
+                  <p className="text-xl sm:text-2xl font-bold text-white ml-2">
                     {game.awayTeam.score}
                   </p>
                 </div>
@@ -124,10 +146,23 @@ export default function Scoreboard() {
                   <span className="text-xs sm:text-sm font-semibold text-slate-500">vs</span>
                 </div>
                 <div className="flex justify-between items-center mb-2 sm:mb-3">
-                  <p className="font-semibold text-sm sm:text-base text-slate-100">
-                    {game.homeTeam.name}
-                  </p>
-                  <p className="text-xl sm:text-2xl font-bold text-white">
+                  <div className="flex items-center gap-2 sm:gap-3 flex-1">
+                    {game.homeTeam.logo && (
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 flex-shrink-0">
+                        <Image
+                          src={game.homeTeam.logo}
+                          alt={`${game.homeTeam.name} logo`}
+                          width={40}
+                          height={40}
+                          className="object-contain w-full h-full"
+                        />
+                      </div>
+                    )}
+                    <p className="font-semibold text-sm sm:text-base text-slate-100">
+                      {game.homeTeam.name}
+                    </p>
+                  </div>
+                  <p className="text-xl sm:text-2xl font-bold text-white ml-2">
                     {game.homeTeam.score}
                   </p>
                 </div>

@@ -11,10 +11,14 @@ export async function GET() {
       homeTeam: {
         name: game.homeTeam.name.default,
         score: game.homeTeam.score,
+        logo: game.homeTeam.logo,
+        darkLogo: game.homeTeam.darkLogo,
       },
       awayTeam: {
         name: game.awayTeam.name.default,
         score: game.awayTeam.score,
+        logo: game.awayTeam.logo,
+        darkLogo: game.awayTeam.darkLogo,
       },
       status: game.gameState,
     }));
