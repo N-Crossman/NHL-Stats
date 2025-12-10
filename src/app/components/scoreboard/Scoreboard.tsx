@@ -28,6 +28,18 @@ interface NHLApiGame {
     status: string;
 }
 
+function formatGameStatus(status: string): string {
+    const statusMap: { [key: string]: string } = {
+        "FUT": "Scheduled",
+        "LIVE": "In Progress",
+        "FINAL": "Final",
+        "PPD": "Postponed",
+        "Cancelled": "Cancelled",
+        "PRE" : "Pre-Game"
+    };
+    return statusMap[status] || status;
+}
+
 export default function Scoreboard() {
   const [games, setGames] = useState<GameInfo[]>([]);
   const [loading, setLoading] = useState(true);
@@ -47,10 +59,12 @@ export default function Scoreboard() {
         }
 
         const parsedGames: GameInfo[] = data.games.map((game: NHLApiGame) => {
-          const localTime = new Date(game.gameDate).toLocaleTimeString([], {
+          const gameDate = new Date(game.gameDate);
+          const localTime = gameDate.toLocaleTimeString('en-US', {
             hour: "numeric",
             minute: "2-digit",
             hour12: true,
+            timeZoneName: "short",
           });
 
           return {
@@ -63,7 +77,7 @@ export default function Scoreboard() {
               name: game.awayTeam.name,
               score: game.awayTeam.score,
             },
-            status: game.status,
+            status: formatGameStatus(game.status),
             localTime,
           };
         });
