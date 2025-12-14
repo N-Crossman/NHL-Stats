@@ -39,7 +39,7 @@ function formatGameStatus(status: string): string {
     const statusMap: { [key: string]: string } = {
         "FUT": "Scheduled",
         "LIVE": "In Progress",
-        "FINAL": "Final",
+        "OFF": "Final",
         "PPD": "Postponed",
         "Cancelled": "Cancelled",
         "PRE" : "Pre-Game"
