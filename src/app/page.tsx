@@ -1,4 +1,5 @@
 import Scoreboard from './components/scoreboard/Scoreboard';
+import Standings from './components/standings/Standings';
 
 export default function Home () {
   return (
@@ -6,6 +7,7 @@ export default function Home () {
       <h1 className="text-3xl font-bold mb-4">NHL Stats</h1>
       <section className="mb-8">
         <Scoreboard />
+        <Standings />
       </section>
       </main>
   );
