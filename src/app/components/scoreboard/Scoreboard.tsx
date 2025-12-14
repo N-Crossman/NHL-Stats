@@ -50,14 +50,14 @@ interface NHLApiGame {
 
 function formatGameStatus(status: string): string {
     const statusMap: { [key: string]: string } = {
-        "FUT": "Scheduled",
-        "LIVE": "In Progress",
-        "OFF": "Game Over",
-        "PPD": "Postponed",
-        "PRE" : "Pre-Game",
-        "CRIT" : "Crunch Time",
-        "FINAL" : "Final",
-        "OVER" : "Recently Ended"
+        "FUT": "Scheduled", // The game is scheuled for a future time
+        "LIVE": "In Progress", // The game is currently being played
+        "OFF": "Final", // The game has ended
+        "PPD": "Postponed", // The game has been postponed
+        "PRE" : "Pre-Game", // The game is in pre-game status, usually 30 minutes before start
+        "CRIT" : "Crunch Time", // The game is in late third period, often in the final minutes
+        "FINAL" : "Final", // The game has ended
+        "OVER" : "Final" // The game has ended
     };
     return statusMap[status] || status;
 }
