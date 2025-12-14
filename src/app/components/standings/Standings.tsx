@@ -55,8 +55,8 @@ export default function Standings() {
   }
 
   return (
-    <section className="mt-10 px-2 sm:px-0">
-      <div className="bg-slate-900/80 backdrop-blur border border-slate-700/50 rounded-2xl shadow-2xl max-w-8xl mx-auto p-4 sm:p-6">
+    <section className="mt-10 px-2 sm:px-6">
+        <div className="bg-slate-900/80 backdrop-blur border border-slate-700/50 rounded-2xl shadow-2xl p-4 sm:p-6">
         <h2 className="text-2xl sm:text-3xl font-bold mb-4 text-center bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
           League Standings
         </h2>
@@ -67,10 +67,10 @@ export default function Standings() {
               <tr className="text-left text-slate-400">
                 <th className="py-2 pr-2">#</th>
                 <th className="py-2">Team</th>
-                <th className="py-2 text-center">GP</th>
-                <th className="py-2 text-center">W</th>
-                <th className="py-2 text-center">L</th>
-                <th className="py-2 text-center">OT</th>
+                <th className="py-2 text-center hidden sm:table-cell">GP</th>
+                <th className="py-2 text-center hidden sm:table-cell">W</th>
+                <th className="py-2 text-center hidden sm:table-cell">L</th>
+                <th className="py-2 text-center hidden sm:table-cell">OT</th>
                 <th className="py-2 text-center font-semibold">PTS</th>
               </tr>
             </thead>
@@ -89,17 +89,17 @@ export default function Standings() {
                     <Image
                       src={team.logo}
                       alt={team.name}
-                      width={24}
-                      height={24}
+                      width={34}
+                      height={34}
                       className="object-contain"
                     />
                     <span className="font-medium">{team.name}</span>
                   </td>
 
-                  <td className="py-2 text-center">{team.gamesPlayed}</td>
-                  <td className="py-2 text-center">{team.wins}</td>
-                  <td className="py-2 text-center">{team.losses}</td>
-                  <td className="py-2 text-center">{team.otLosses}</td>
+                  <td className="py-2 text-center hidden sm:table-cell">{team.gamesPlayed}</td>
+                  <td className="py-2 text-center hidden sm:table-cell">{team.wins}</td>
+                  <td className="py-2 text-center hidden sm:table-cell">{team.losses}</td>
+                  <td className="py-2 text-center hidden sm:table-cell">{team.otLosses}</td>
                   <td className="py-2 text-center font-bold text-white">
                     {team.points}
                   </td>
