@@ -14,8 +14,11 @@ export async function GET() {
         inIntermission: game.clock?.inIntermission ?? false,
       },
 
-      period: game.periodDescriptor?.number ?? null,
-      
+      period:{
+         number: game.periodDescriptor?.number ?? null,
+         type: game.periodDescriptor?.type ?? null,
+      },
+
       homeTeam: {
         name: game.homeTeam.name.default,
         score: game.homeTeam.score,

@@ -19,7 +19,10 @@ interface GameInfo {
     timeRemaining: string | null;
     inIntermission: boolean;
   };
-  period: number | null;
+  period: {
+    number: number | null;
+    type: string | null;
+  };
 }
 
 interface NHLApiGame {
@@ -191,7 +194,7 @@ export default function Scoreboard() {
                     }`}
                   >
                     {game.status === "In Progress"
-                      ? `P${game.period ?? "?"} • ${game.clock?.timeRemaining ?? "00:00"}`
+                      ? `P${game.period?.number ?? "?"}${game.period?.type === "OVERTIME" ? " OT" : game.period?.type === "SHOOTOUT" ? " SO" : ""} • ${game.clock?.timeRemaining ?? "00:00"}`
                       : `${game.status} • ${game.localTime}`}
                   </p>
                 </div>
