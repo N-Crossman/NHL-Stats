@@ -7,7 +7,7 @@ export async function GET() {
     const data = await response.json();
     const games = (data.games || []).map((game: any) => ({
       gamePk: game.id,
-      gameDate: game.gameDate,
+      gameDate: game.startTimeUTC,
       homeTeam: {
         name: game.homeTeam.name.default,
         score: game.homeTeam.score,
