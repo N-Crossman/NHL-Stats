@@ -8,6 +8,14 @@ export async function GET() {
     const games = (data.games || []).map((game: any) => ({
       gamePk: game.id,
       gameDate: game.startTimeUTC,
+
+      clock: {
+        timeRemaining: game.clock?.timeRemaining ?? null,
+        inIntermission: game.clock?.inIntermission ?? false,
+      },
+
+      period: game.periodDescriptor?.number ?? null,
+      
       homeTeam: {
         name: game.homeTeam.name.default,
         score: game.homeTeam.score,

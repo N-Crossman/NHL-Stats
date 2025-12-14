@@ -15,6 +15,11 @@ interface GameInfo {
   awayTeam: TeamInfo;
   status: string;
   localTime: string;
+  clock: {
+    timeRemaining: string | null;
+    inIntermission: boolean;
+  };
+  period: number | null;
 }
 
 interface NHLApiGame {
@@ -33,16 +38,23 @@ interface NHLApiGame {
         darkLogo?: string;
     };
     status: string;
+    clock: {
+        timeRemaining: string | null;
+        inIntermission: boolean;
+    };
+    period: number | null;
 }
 
 function formatGameStatus(status: string): string {
     const statusMap: { [key: string]: string } = {
         "FUT": "Scheduled",
         "LIVE": "In Progress",
-        "OFF": "Final",
+        "OFF": "Game Over",
         "PPD": "Postponed",
-        "Cancelled": "Cancelled",
-        "PRE" : "Pre-Game"
+        "PRE" : "Pre-Game",
+        "CRIT" : "Crunch Time",
+        "FINAL" : "Final",
+        "OVER" : "Recently Ended"
     };
     return statusMap[status] || status;
 }
@@ -88,6 +100,8 @@ export default function Scoreboard() {
             },
             status: formatGameStatus(game.status),
             localTime,
+            clock: game.clock,
+            period: game.period,
           };
         });
 
@@ -176,7 +190,9 @@ export default function Scoreboard() {
                         : "text-cyan-400"
                     }`}
                   >
-                    {game.status} • {game.localTime}
+                    {game.status === "In Progress"
+                      ? `P${game.period ?? "?"} • ${game.clock?.timeRemaining ?? "00:00"}`
+                      : `${game.status} • ${game.localTime}`}
                   </p>
                 </div>
               </div>
