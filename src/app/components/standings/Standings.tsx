@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 
 interface Team {
   teamId: string;
@@ -85,15 +86,20 @@ export default function Standings() {
                     {index + 1}
                   </td>
 
-                  <td className="py-3 flex items-center gap-4">
-                    <Image
-                      src={team.logo}
-                      alt={team.name}
-                      width={34}
-                      height={34}
-                      className="object-contain"
-                    />
-                    <span className="font-medium">{team.name}</span>
+                  <td className="py-3">
+                    <Link 
+                      href={`/team/${team.teamId}`}
+                      className="flex items-center gap-4 hover:text-blue-400 transition-colors"
+                    >
+                      <Image
+                        src={team.logo}
+                        alt={team.name}
+                        width={34}
+                        height={34}
+                        className="object-contain"
+                      />
+                      <span className="font-medium">{team.name}</span>
+                    </Link>
                   </td>
 
                   <td className="py-2 text-center hidden sm:table-cell">{team.gamesPlayed}</td>
