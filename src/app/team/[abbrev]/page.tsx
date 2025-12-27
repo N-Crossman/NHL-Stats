@@ -87,7 +87,10 @@ export default function TeamPage() {
                                     {player.sweaterNumber}
                                 </td>
                                 <td className="py-3 px-4">
-                                    <div className="flex items-center gap-3">
+                                    <Link 
+                                        href={`/player/${player.id}`}
+                                        className="flex items-center gap-3 hover:text-blue-500 transition-colors"
+                                    >
                                         {player.headshot && (
                                             // eslint-disable-next-line @next/next/no-img-element
                                             <img
@@ -99,7 +102,7 @@ export default function TeamPage() {
                                         <span>
                                             {player.firstName.default} {player.lastName.default}
                                         </span>
-                                    </div>
+                                    </Link>
                                 </td>
                                 <td className="py-3 px-4">{player.positionCode}</td>
                             </tr>
