@@ -16,7 +16,7 @@ export default function Navbar() {
     <nav className="bg-gray-900 text-white px-4 py-3 shadow-md fixed w-full z-50">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         <Link href="/" className="text-xl font-extrabold hover:text-blue-300">
-          NHL Stats
+          Pucklytics
         </Link>
         
         <ul className="hidden md:flex flex-1 justify-center gap-44">

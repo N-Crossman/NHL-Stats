@@ -13,7 +13,7 @@ export default function Footer() {
     <footer className="bg-gray-900 text-white px-4 py-8 mx-auto w-full">
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
         <div>
-          <h2 className="text-lg font-bold mb-4">NHL Stats App</h2>
+          <h2 className="text-lg font-extrabold mb-4">Pucklytics</h2>
           <p className="text-sm">
             Your go-to source for comprehensive NHL statistics and information.
           </p>
@@ -35,7 +35,7 @@ export default function Footer() {
         </div>
         
         <div className="flex flex-col items-center md:items-end gap-2">
-          <p className="text-sm">© {new Date().getFullYear()} NHL Stats App. All rights reserved.</p>
+          <p className="text-sm">© {new Date().getFullYear()} Pucklytics. All rights reserved.</p>
           <p className="text-sm">Data sourced from NHL API.</p>
           <Link
             href="https://github.com/N-Crossman"

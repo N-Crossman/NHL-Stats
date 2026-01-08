@@ -4,7 +4,7 @@ import Navbar from "./components/navigation/Navbar";
 import Footer from "./components/navigation/Footer";
 
 export const metadata: Metadata = {
-  title: "NHL Stats App",
+  title: "Pucklytics",
   description: "A Next.js app to display NHL statistics",
 };
 
