@@ -91,13 +91,14 @@ export default function Standings() {
                       href={`/team/${team.teamId}`}
                       className="flex items-center gap-4 hover:text-blue-400 transition-colors"
                     >
-                      <Image
-                        src={team.logo}
-                        alt={team.name}
-                        width={34}
-                        height={34}
-                        className="object-contain"
-                      />
+                      <div className="relative w-[34px] h-[34px]">
+                        <Image
+                          src={team.logo}
+                          alt={team.name}
+                          fill
+                          className="object-contain"
+                        />
+                      </div>
                       <span className="font-medium">{team.name}</span>
                     </Link>
                   </td>

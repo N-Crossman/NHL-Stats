@@ -141,13 +141,12 @@ export default function Scoreboard() {
                 <div className="flex justify-between items-center mb-2">
                   <div className="flex items-center gap-2 sm:gap-3 flex-1">
                     {game.awayTeam.logo && (
-                      <div className="w-8 h-8 sm:w-10 sm:h-10 flex-shrink-0">
+                      <div className="relative w-8 h-8 sm:w-10 sm:h-10 flex-shrink-0">
                         <Image
                           src={game.awayTeam.logo}
                           alt={`${game.awayTeam.name} logo`}
-                          width={40}
-                          height={40}
-                          className="object-contain w-full h-full"
+                          fill
+                          className="object-contain"
                         />
                       </div>
                     )}
@@ -165,13 +164,12 @@ export default function Scoreboard() {
                 <div className="flex justify-between items-center mb-2 sm:mb-3">
                   <div className="flex items-center gap-2 sm:gap-3 flex-1">
                     {game.homeTeam.logo && (
-                      <div className="w-8 h-8 sm:w-10 sm:h-10 flex-shrink-0">
+                      <div className="relative w-8 h-8 sm:w-10 sm:h-10 flex-shrink-0">
                         <Image
                           src={game.homeTeam.logo}
                           alt={`${game.homeTeam.name} logo`}
-                          width={40}
-                          height={40}
-                          className="object-contain w-full h-full"
+                          fill
+                          className="object-contain"
                         />
                       </div>
                     )}
