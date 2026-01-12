@@ -25,9 +25,11 @@ export async function GET() {
               goals: 0,
               assists: 0,
               gamesPlayed: 0,
+              headshot: player.headshot || '',
+              teamLogo: player.teamLogo || '',
             });
           }
-          
+
           const currentPlayer = playerMap.get(playerId);
           if (category === 'points') currentPlayer.points = player.value || 0;
           if (category === 'goals') currentPlayer.goals = player.value || 0;

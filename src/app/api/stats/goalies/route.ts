@@ -25,6 +25,8 @@ export async function GET() {
               savePctg: 0,
               shutouts: 0,
               wins: 0,
+              headshot: player.headshot || '',
+              teamLogo: player.teamLogo || '',
             });
           }
 
