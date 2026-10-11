@@ -1,8 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, ReactNode } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import Card from '../components/ui/Card';
+import SectionHeading from '../components/ui/SectionHeading';
+import Pill from '../components/ui/Pill';
+import { LoadingState } from '../components/ui/StateMessage';
 
 interface SkaterStats {
   playerId: number;
@@ -36,6 +40,83 @@ interface DefensemanStats {
   teamLogo: string;
 }
 
+const RANK_STYLES = [
+  'text-amber-400', // 1st — gold
+  'text-slate-300', // 2nd — silver
+  'text-orange-400', // 3rd — bronze
+];
+
+function RankBadge({ index }: { index: number }) {
+  return (
+    <span className={`text-sm font-bold ${RANK_STYLES[index] ?? 'text-slate-500'}`}>
+      {index + 1}
+    </span>
+  );
+}
+
+function PlayerCell({
+  playerId,
+  name,
+  headshot,
+  teamLogo,
+}: {
+  playerId: number;
+  name: string;
+  headshot?: string;
+  teamLogo?: string;
+}) {
+  return (
+    <div className="flex items-center gap-2">
+      {headshot && (
+        <Image
+          src={headshot}
+          alt={name}
+          width={36}
+          height={36}
+          className="rounded-full object-cover bg-slate-800 h-9 w-9"
+        />
+      )}
+      <Link href={`/player/${playerId}`} className="hover:text-cyan-400 transition-colors font-medium">
+        {name}
+      </Link>
+      {teamLogo && <Image src={teamLogo} alt="team" width={28} height={28} className="object-contain" />}
+    </div>
+  );
+}
+
+function StatTable({
+  headers,
+  rows,
+}: {
+  headers: [string, string, string];
+  rows: { key: number; rank: number; cell: ReactNode; stat: ReactNode }[];
+}) {
+  return (
+    <div className="overflow-x-auto -mx-2">
+      <table className="w-full">
+        <thead className="border-b border-slate-800">
+          <tr className="text-left text-xs text-slate-400 uppercase tracking-wide">
+            <th className="pb-3 px-2 font-semibold w-10">{headers[0]}</th>
+            <th className="pb-3 px-2 font-semibold">{headers[1]}</th>
+            <th className="pb-3 px-2 font-semibold text-right">{headers[2]}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row) => (
+            <tr key={row.key} className="border-b border-slate-800/60 last:border-0 hover:bg-slate-800/40 transition-colors">
+              <td className="py-3 px-2">
+                <RankBadge index={row.rank} />
+              </td>
+              <td className="py-2 px-2 text-sm">{row.cell}</td>
+              <td className="py-3 px-2 text-sm text-right font-semibold text-slate-100">{row.stat}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 export default function StatsPage() {
   const [skaterFilter, setSkaterFilter] = useState<'points' | 'goals' | 'assists'>('points');
   const [skaters, setSkaters] = useState<SkaterStats[]>([]);
@@ -65,12 +146,9 @@ export default function StatsPage() {
         setSkaters(skaterData.skaters || []);
         setGoalies(goalieData.goalies || []);
         setDefensemen(defensemenData.defensemen || []);
-
-        setSkaterLoading(false);
-        setGoalieLoading(false);
-        setDefensemenLoading(false);
       } catch (error) {
         console.error('Error fetching stats:', error);
+      } finally {
         setSkaterLoading(false);
         setGoalieLoading(false);
         setDefensemenLoading(false);
@@ -83,322 +161,123 @@ export default function StatsPage() {
   const sortedSkaters = [...skaters].sort((a, b) => {
     if (skaterFilter === 'points') return b.points - a.points;
     if (skaterFilter === 'goals') return b.goals - a.goals;
-    if (skaterFilter === 'assists') return b.assists - a.assists;
-    return 0;
+    return b.assists - a.assists;
   });
 
   const sortedGoalies = [...goalies]
-    .filter((g) => {
-      // When filtering by GAA, exclude goalies with 0 GAA
-      if (goalieFilter === 'gaa') return g.goalsAgainstAverage > 0;
-      return true;
-    })
+    .filter((g) => (goalieFilter === 'gaa' ? g.goalsAgainstAverage > 0 : true))
     .sort((a, b) => {
       if (goalieFilter === 'gaa') return a.goalsAgainstAverage - b.goalsAgainstAverage;
       if (goalieFilter === 'sv%') return b.savePctg - a.savePctg;
-      if (goalieFilter === 'shutouts') return b.shutouts - a.shutouts;
-      return 0;
+      return b.shutouts - a.shutouts;
     });
 
   const sortedDefensemen = [...defensemen].sort((a, b) => {
     if (defensemenFilter === 'points') return b.points - a.points;
     if (defensemenFilter === 'goals') return b.goals - a.goals;
-    if (defensemenFilter === 'assists') return b.assists - a.assists;
-    return 0;
+    return b.assists - a.assists;
   });
 
   return (
-    <div className="min-h-screen text-white p-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-12">
-          <h1 className="text-4xl font-bold mb-2 mt-8">Statistics</h1>
-          <p className="text-xl text-gray-400">2025-2026 Season</p>
-        </div>
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+      <SectionHeading title="Statistics" subtitle="2025-2026 Season" align="left" />
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-          <div className="bg-gray-800 rounded-lg p-6">
-            <h2 className="text-2xl font-bold mb-4">Skaters</h2>
-
-            <div className="flex gap-2 mb-6">
-              <button
-                onClick={() => setSkaterFilter('points')}
-                className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
-                  skaterFilter === 'points'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                }`}
-              >
-                Points
-              </button>
-              <button
-                onClick={() => setSkaterFilter('goals')}
-                className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
-                  skaterFilter === 'goals'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                }`}
-              >
-                Goals
-              </button>
-              <button
-                onClick={() => setSkaterFilter('assists')}
-                className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
-                  skaterFilter === 'assists'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                }`}
-              >
-                Assists
-              </button>
-            </div>
-
-            {skaterLoading ? (
-              <p className="text-gray-400">Loading...</p>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="border-b border-gray-700">
-                    <tr className="text-left text-sm text-white">
-                      <th className="pb-3 font-semibold w-12">#</th>
-                      <th className="pb-3 font-semibold">Player</th>
-                      <th className="pb-3 font-semibold text-right">
-                        {skaterFilter === 'points' && 'Points'}
-                        {skaterFilter === 'goals' && 'Goals'}
-                        {skaterFilter === 'assists' && 'Assists'}
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {sortedSkaters.slice(0, 10).map((player, index) => (
-                      <tr key={player.playerId} className="border-b border-gray-700 hover:bg-gray-700 transition-colors">
-                        <td className="py-3 text-sm font-semibold text-white">{index + 1}</td>
-                        <td className="py-3 text-sm">
-                          <div className="flex items-center gap-2">
-                            {player.headshot && (
-                              <Image
-                                src={player.headshot}
-                                alt={player.skaterFullName}
-                                width={36}
-                                height={36}
-                                className="rounded-full object-cover"
-                              />
-                            )}
-                            <Link href={`/player/${player.playerId}`} className="hover:text-blue-400 transition-colors">
-                              {player.skaterFullName}
-                            </Link>
-                            {player.teamLogo && (
-                              <Image
-                                src={player.teamLogo}
-                                alt="team"
-                                width={32}
-                                height={32}
-                                className="object-contain"
-                              />
-                            )}
-                          </div>
-                        </td>
-                        <td className="py-3 text-sm text-right font-semibold">
-                          {skaterFilter === 'points' && player.points}
-                          {skaterFilter === 'goals' && player.goals}
-                          {skaterFilter === 'assists' && player.assists}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 mb-6 sm:mb-8">
+        <Card className="p-5 sm:p-6">
+          <h2 className="text-xl font-bold text-white mb-4">Skaters</h2>
+          <div className="flex gap-2 mb-5 flex-wrap">
+            <Pill active={skaterFilter === 'points'} onClick={() => setSkaterFilter('points')}>Points</Pill>
+            <Pill active={skaterFilter === 'goals'} onClick={() => setSkaterFilter('goals')}>Goals</Pill>
+            <Pill active={skaterFilter === 'assists'} onClick={() => setSkaterFilter('assists')}>Assists</Pill>
           </div>
 
-          <div className="bg-gray-800 rounded-lg p-6">
-            <h2 className="text-2xl font-bold mb-4">Goalies</h2>
-
-            <div className="flex gap-2 mb-6">
-              <button
-                onClick={() => setGoalieFilter('gaa')}
-                className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
-                  goalieFilter === 'gaa'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                }`}
-              >
-                GAA
-              </button>
-              <button
-                onClick={() => setGoalieFilter('sv%')}
-                className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
-                  goalieFilter === 'sv%'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                }`}
-              >
-                SV%
-              </button>
-              <button
-                onClick={() => setGoalieFilter('shutouts')}
-                className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
-                  goalieFilter === 'shutouts'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                }`}
-              >
-                Shutouts
-              </button>
-            </div>
-
-            {goalieLoading ? (
-              <p className="text-gray-400">Loading...</p>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="border-b border-gray-700">
-                    <tr className="text-left text-sm text-white">
-                      <th className="pb-3 font-semibold w-12">#</th>
-                      <th className="pb-3 font-semibold">Player</th>
-                      <th className="pb-3 font-semibold text-right">
-                        {goalieFilter === 'gaa' && 'GAA'}
-                        {goalieFilter === 'sv%' && 'SV%'}
-                        {goalieFilter === 'shutouts' && 'SO'}
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {sortedGoalies.slice(0, 10).map((player, index) => (
-                      <tr key={player.playerId} className="border-b border-gray-700 hover:bg-gray-700 transition-colors">
-                        <td className="py-3 text-sm font-semibold text-white">{index + 1}</td>
-                        <td className="py-3 text-sm">
-                          <div className="flex items-center gap-2">
-                            {player.headshot && (
-                              <Image
-                                src={player.headshot}
-                                alt={player.goaltendersFullName}
-                                width={36}
-                                height={36}
-                                className="rounded-full object-cover"
-                              />
-                            )}
-                            <Link href={`/player/${player.playerId}`} className="hover:text-blue-400 transition-colors">
-                              {player.goaltendersFullName}
-                            </Link>
-                            {player.teamLogo && (
-                              <Image
-                                src={player.teamLogo}
-                                alt="team"
-                                width={32}
-                                height={32}
-                                className="object-contain"
-                              />
-                            )}
-                          </div>
-                        </td>
-                        <td className="py-3 text-sm text-right font-semibold">
-                          {goalieFilter === 'gaa' && player.goalsAgainstAverage.toFixed(2)}
-                          {goalieFilter === 'sv%' && player.savePctg.toFixed(3).substring(1) + '%'}
-                          {goalieFilter === 'shutouts' && player.shutouts}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className="bg-gray-800 rounded-lg p-6">
-          <h2 className="text-2xl font-bold mb-4">Defensemen</h2>
-
-          <div className="flex gap-2 mb-6">
-            <button
-              onClick={() => setDefensemenFilter('points')}
-              className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
-                defensemenFilter === 'points'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-              }`}
-            >
-              Points
-            </button>
-            <button
-              onClick={() => setDefensemenFilter('goals')}
-              className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
-                defensemenFilter === 'goals'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-              }`}
-            >
-              Goals
-            </button>
-            <button
-              onClick={() => setDefensemenFilter('assists')}
-              className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
-                defensemenFilter === 'assists'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-              }`}
-            >
-              Assists
-            </button>
-          </div>
-
-          {defensemenLoading ? (
-            <p className="text-gray-400">Loading...</p>
+          {skaterLoading ? (
+            <LoadingState />
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="border-b border-gray-700">
-                  <tr className="text-left text-sm text-white">
-                    <th className="pb-3 font-semibold w-12">#</th>
-                    <th className="pb-3 font-semibold">Player</th>
-                    <th className="pb-3 font-semibold text-right">
-                      {defensemenFilter === 'points' && 'Points'}
-                      {defensemenFilter === 'goals' && 'Goals'}
-                      {defensemenFilter === 'assists' && 'Assists'}
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {sortedDefensemen.slice(0, 10).map((player, index) => (
-                    <tr key={player.playerId} className="border-b border-gray-700 hover:bg-gray-700 transition-colors">
-                      <td className="py-3 text-sm font-semibold text-white">{index + 1}</td>
-                      <td className="py-3 text-sm">
-                        <div className="flex items-center gap-2">
-                          {player.headshot && (
-                            <Image
-                              src={player.headshot}
-                              alt={player.skaterFullName}
-                              width={36}
-                              height={36}
-                              className="rounded-full object-cover"
-                            />
-                          )}
-                          <Link href={`/player/${player.playerId}`} className="hover:text-blue-400 transition-colors">
-                            {player.skaterFullName}
-                          </Link>
-                          {player.teamLogo && (
-                            <Image
-                              src={player.teamLogo}
-                              alt="team"
-                              width={32}
-                              height={32}
-                              className="object-contain"
-                            />
-                          )}
-                        </div>
-                      </td>
-                      <td className="py-3 text-sm text-right font-semibold">
-                        {defensemenFilter === 'points' && player.points}
-                        {defensemenFilter === 'goals' && player.goals}
-                        {defensemenFilter === 'assists' && player.assists}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <StatTable
+              headers={['#', 'Player', skaterFilter === 'points' ? 'Points' : skaterFilter === 'goals' ? 'Goals' : 'Assists']}
+              rows={sortedSkaters.slice(0, 10).map((player, index) => ({
+                key: player.playerId,
+                rank: index,
+                cell: (
+                  <PlayerCell
+                    playerId={player.playerId}
+                    name={player.skaterFullName}
+                    headshot={player.headshot}
+                    teamLogo={player.teamLogo}
+                  />
+                ),
+                stat: skaterFilter === 'points' ? player.points : skaterFilter === 'goals' ? player.goals : player.assists,
+              }))}
+            />
           )}
-        </div>
+        </Card>
+
+        <Card className="p-5 sm:p-6">
+          <h2 className="text-xl font-bold text-white mb-4">Goalies</h2>
+          <div className="flex gap-2 mb-5 flex-wrap">
+            <Pill active={goalieFilter === 'gaa'} onClick={() => setGoalieFilter('gaa')}>GAA</Pill>
+            <Pill active={goalieFilter === 'sv%'} onClick={() => setGoalieFilter('sv%')}>SV%</Pill>
+            <Pill active={goalieFilter === 'shutouts'} onClick={() => setGoalieFilter('shutouts')}>Shutouts</Pill>
+          </div>
+
+          {goalieLoading ? (
+            <LoadingState />
+          ) : (
+            <StatTable
+              headers={['#', 'Player', goalieFilter === 'gaa' ? 'GAA' : goalieFilter === 'sv%' ? 'SV%' : 'SO']}
+              rows={sortedGoalies.slice(0, 10).map((player, index) => ({
+                key: player.playerId,
+                rank: index,
+                cell: (
+                  <PlayerCell
+                    playerId={player.playerId}
+                    name={player.goaltendersFullName}
+                    headshot={player.headshot}
+                    teamLogo={player.teamLogo}
+                  />
+                ),
+                stat:
+                  goalieFilter === 'gaa'
+                    ? player.goalsAgainstAverage.toFixed(2)
+                    : goalieFilter === 'sv%'
+                    ? player.savePctg.toFixed(3).substring(1) + '%'
+                    : player.shutouts,
+              }))}
+            />
+          )}
+        </Card>
       </div>
+
+      <Card className="p-5 sm:p-6">
+        <h2 className="text-xl font-bold text-white mb-4">Defensemen</h2>
+        <div className="flex gap-2 mb-5 flex-wrap">
+          <Pill active={defensemenFilter === 'points'} onClick={() => setDefensemenFilter('points')}>Points</Pill>
+          <Pill active={defensemenFilter === 'goals'} onClick={() => setDefensemenFilter('goals')}>Goals</Pill>
+          <Pill active={defensemenFilter === 'assists'} onClick={() => setDefensemenFilter('assists')}>Assists</Pill>
+        </div>
+
+        {defensemenLoading ? (
+          <LoadingState />
+        ) : (
+          <StatTable
+            headers={['#', 'Player', defensemenFilter === 'points' ? 'Points' : defensemenFilter === 'goals' ? 'Goals' : 'Assists']}
+            rows={sortedDefensemen.slice(0, 10).map((player, index) => ({
+              key: player.playerId,
+              rank: index,
+              cell: (
+                <PlayerCell
+                  playerId={player.playerId}
+                  name={player.skaterFullName}
+                  headshot={player.headshot}
+                  teamLogo={player.teamLogo}
+                />
+              ),
+              stat: defensemenFilter === 'points' ? player.points : defensemenFilter === 'goals' ? player.goals : player.assists,
+            }))}
+          />
+        )}
+      </Card>
     </div>
   );
 }

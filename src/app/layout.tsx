@@ -1,11 +1,32 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "./components/navigation/Navbar";
 import Footer from "./components/navigation/Footer";
 
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
 export const metadata: Metadata = {
-  title: "Pucklytics",
-  description: "A Next.js app to display NHL statistics",
+  title: {
+    default: "Pucklytics — NHL Stats, Scores & Standings",
+    template: "%s — Pucklytics",
+  },
+  description:
+    "Live NHL scores, player stats, team rosters, and league standings in one modern dashboard.",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: "#040609",
 };
 
 export default function RootLayout({
@@ -15,9 +36,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="flex flex-col min-h-screen bg-gray-100 text-gray-900">
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} flex flex-col min-h-screen antialiased`}
+      >
         <Navbar />
-        <main className="flex-1">{children}</main>
+        <main className="flex-1 pt-16">{children}</main>
         <Footer />
       </body>
     </html>

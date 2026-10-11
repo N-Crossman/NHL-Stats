@@ -1,15 +1,15 @@
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
+import Card from '../../components/ui/Card';
 
 interface PlayerPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 export default async function PlayerPage(props: PlayerPageProps) {
-    const params = await props.params;
-    const { id } = params;
+    const { id } = await props.params;
     const base = "https://api-web.nhle.com/v1";
 
     const res = await fetch(`${base}/player/${id}/landing`, {
@@ -19,7 +19,7 @@ export default async function PlayerPage(props: PlayerPageProps) {
   if (!res.ok) {
     return notFound();
   }
-  
+
   const data = await res.json();
 
   const {
@@ -44,7 +44,7 @@ export default async function PlayerPage(props: PlayerPageProps) {
   const teamName = fullTeamName?.default || 'Free Agent';
   const positionCode = position || 'N/A';
   const isGoalie = position === 'G';
-  
+
   // Convert height to feet and inches
   const feet = Math.floor(heightInInches / 12);
   const inches = heightInInches % 12;
@@ -55,28 +55,38 @@ export default async function PlayerPage(props: PlayerPageProps) {
     month: 'long',
     day: 'numeric'
   });
-  
-  const birthLocation = birthStateProvince 
+
+  const birthLocation = birthStateProvince
     ? `${birthCity.default}, ${birthStateProvince.default}`
     : birthCity.default;
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8">
-      <div className="text-center mb-8 mt-6">
-        <Image
-            src={headshot}
-            alt={fullName}
-            width={200}
-            height={200}
-            className="rounded-full mx-auto mb-4"
-        />
-        <h1 className="text-4xl font-bold mb-2">{fullName}</h1>
-        <p className="text-xl text-gray-400">#{sweaterNumber} - {teamName}</p>
-      </div>
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+      <Card className="relative overflow-hidden mb-10">
+        {heroImage && (
+          <div className="absolute inset-0">
+            <Image src={heroImage} alt="" fill className="object-cover opacity-20" />
+            <div className="absolute inset-0 bg-slate-950/75" />
+          </div>
+        )}
+        <div className="relative text-center px-6 py-10 sm:py-12">
+          <Image
+              src={headshot}
+              alt={fullName}
+              width={160}
+              height={160}
+              className="rounded-full mx-auto mb-4 ring-4 ring-slate-800 bg-slate-800 object-cover"
+          />
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-white mb-2">{fullName}</h1>
+          <p className="text-base sm:text-lg text-slate-400">
+            <span className="accent-text font-semibold">#{sweaterNumber}</span> &middot; {teamName}
+          </p>
+        </div>
+      </Card>
 
       <section className="mb-10">
-        <h2 className="text-2xl font-semibold mb-4">Player Information</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+        <h2 className="text-xl sm:text-2xl font-bold text-white mb-4">Player Information</h2>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
           <InfoCard label="Position" value={positionCode} />
           <InfoCard label="Jersey Number" value={`#${sweaterNumber}`} />
           <InfoCard label="Height" value={heightDisplay} />
@@ -87,22 +97,9 @@ export default async function PlayerPage(props: PlayerPageProps) {
         </div>
       </section>
 
-      {heroImage && (
-        <section className="mb-10">
-          <div className="relative w-full h-64 sm:h-96 rounded-lg overflow-hidden">
-            <Image
-              src={heroImage}
-              alt={`${fullName} action shot`}
-              fill
-              className="object-cover"
-            />
-          </div>
-        </section>
-      )}
-
       <section className="mb-10">
-        <h2 className="text-2xl font-semibold mb-4">Current Season Stats</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <h2 className="text-xl sm:text-2xl font-bold text-white mb-4">Current Season Stats</h2>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
           {featuredStats?.regularSeason?.subSeason && (
             <>
               {isGoalie ? (
@@ -120,7 +117,7 @@ export default async function PlayerPage(props: PlayerPageProps) {
                   <StatCard label="Games Played" value={featuredStats.regularSeason.subSeason.gamesPlayed} />
                   <StatCard label="Goals" value={featuredStats.regularSeason.subSeason.goals} />
                   <StatCard label="Assists" value={featuredStats.regularSeason.subSeason.assists} />
-                  <StatCard label="Points" value={featuredStats.regularSeason.subSeason.points} />
+                  <StatCard label="Points" value={featuredStats.regularSeason.subSeason.points} highlight />
                   <StatCard label="Plus/Minus" value={featuredStats.regularSeason.subSeason.plusMinus} />
                   <StatCard label="PPG" value={featuredStats.regularSeason.subSeason.powerPlayGoals} />
                   <StatCard label="Shots" value={featuredStats.regularSeason.subSeason.shots} />
@@ -131,10 +128,10 @@ export default async function PlayerPage(props: PlayerPageProps) {
           )}
         </div>
       </section>
-        
+
       <section>
-        <h2 className="text-2xl font-semibold mb-4">Career Regular Season Totals</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <h2 className="text-xl sm:text-2xl font-bold text-white mb-4">Career Regular Season Totals</h2>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
           {careerTotals?.regularSeason && (
             <>
               {isGoalie ? (
@@ -153,7 +150,7 @@ export default async function PlayerPage(props: PlayerPageProps) {
                   <StatCard label="Games Played" value={careerTotals.regularSeason.gamesPlayed} />
                   <StatCard label="Goals" value={careerTotals.regularSeason.goals} />
                   <StatCard label="Assists" value={careerTotals.regularSeason.assists} />
-                  <StatCard label="Points" value={careerTotals.regularSeason.points} />
+                  <StatCard label="Points" value={careerTotals.regularSeason.points} highlight />
                   <StatCard label="Plus/Minus" value={careerTotals.regularSeason.plusMinus} />
                   <StatCard label="PPG" value={careerTotals.regularSeason.powerPlayGoals} />
                   <StatCard label="Shots" value={careerTotals.regularSeason.shots} />
@@ -168,20 +165,20 @@ export default async function PlayerPage(props: PlayerPageProps) {
   );
 }
 
-function StatCard({ label, value }: { label: string; value: string | number }) {
+function StatCard({ label, value, highlight = false }: { label: string; value: string | number; highlight?: boolean }) {
     return (
-        <div className="rounded-lg border border-neutral-700 p-4 text-center">
-            <div className="text-sm text-gray-400 mb-2">{label}</div>
-            <div className="text-xl font-bold">{value}</div>
-        </div>
-    );  
+        <Card className="p-4 text-center" hover>
+            <div className="text-xs sm:text-sm text-slate-400 mb-1.5">{label}</div>
+            <div className={`text-xl sm:text-2xl font-bold ${highlight ? 'accent-text' : 'text-white'}`}>{value}</div>
+        </Card>
+    );
 }
 
 function InfoCard({ label, value }: { label: string; value: string | number }) {
     return (
-        <div className="rounded-lg border border-neutral-700 p-4">
-            <div className="text-xs text-gray-400 mb-1">{label}</div>
-            <div className="text-lg font-semibold">{value}</div>
-        </div>
-    );  
+        <Card className="p-4">
+            <div className="text-xs text-slate-400 mb-1">{label}</div>
+            <div className="text-base sm:text-lg font-semibold text-white">{value}</div>
+        </Card>
+    );
 }

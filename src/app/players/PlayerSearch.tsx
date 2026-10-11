@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { HiOutlineSearch } from "react-icons/hi";
 
 interface PlayerResult {
   id: string;
@@ -14,7 +15,6 @@ export default function PlayerSearch() {
 
   useEffect(() => {
     if (query.length < 2) {
-      setResults([]);
       return;
     }
 
@@ -35,23 +35,25 @@ export default function PlayerSearch() {
   }, [query]);
 
   return (
-    <div className="relative max-w-xl mt-6">
-        <h1 className="text-xl font-bold mb-4">Players</h1>
-      <input
-        type="text"
-        value={query}
-        onChange={e => setQuery(e.target.value)}
-        placeholder="Search players..."
-        className="w-full rounded-lg border px-4 py-3"
-      />
+    <div className="relative max-w-xl">
+      <div className="relative">
+        <HiOutlineSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
+        <input
+          type="text"
+          value={query}
+          onChange={e => setQuery(e.target.value)}
+          placeholder="Search players..."
+          className="focus-ring w-full rounded-xl bg-slate-900/60 border border-slate-800 pl-11 pr-4 py-3 text-slate-100 placeholder:text-slate-500 transition-colors focus-visible:border-cyan-500/50"
+        />
+      </div>
 
-      {results.length > 0 && (
-        <ul className="absolute z-10 mt-2 w-full rounded-lg border bg-white shadow-lg text-gray-800">
+      {query.length >= 2 && results.length > 0 && (
+        <ul className="absolute z-10 mt-2 w-full rounded-xl border border-slate-800 bg-slate-900/95 backdrop-blur-xl shadow-2xl overflow-hidden">
           {results.map(player => (
             <li key={player.id}>
               <Link
                 href={`/player/${player.id}`}
-                className="block px-4 py-2 hover:bg-blue-300"
+                className="block px-4 py-2.5 text-sm text-slate-200 hover:bg-cyan-500/10 hover:text-cyan-400 transition-colors"
               >
                 {player.name}
               </Link>

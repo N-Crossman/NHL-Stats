@@ -1,9 +1,13 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { GiHockey } from "react-icons/gi";
+import { HiOutlineMenu, HiOutlineX } from "react-icons/hi";
 
 export default function Navbar() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const pathname = usePathname();
 
     const navLinks = [
         { href: "/", label: "Home" },
@@ -12,19 +16,24 @@ export default function Navbar() {
         { href: "/stats", label: "Stats" },
     ];
 
+    const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname?.startsWith(href));
+
     return (
-    <nav className="bg-gray-900 text-white px-4 py-3 shadow-md fixed w-full z-50">
-      <div className="max-w-7xl mx-auto flex items-center justify-between">
-        <Link href="/" className="text-xl font-extrabold hover:text-blue-300">
-          Pucklytics
+    <nav className="fixed top-0 w-full z-50 bg-slate-950/80 backdrop-blur-xl border-b border-slate-800/80">
+      <div className="max-w-7xl mx-auto flex items-center justify-between px-4 py-3">
+        <Link href="/" className="flex items-center gap-2 text-xl font-extrabold text-white focus-ring rounded-lg">
+          <GiHockey className="text-red-500" size={24} />
+          <span className="brand-text">Pucklytics</span>
         </Link>
-        
-        <ul className="hidden md:flex flex-1 justify-center gap-44">
+
+        <ul className="hidden md:flex items-center gap-8">
           {navLinks.map((link) => (
             <li key={link.href}>
               <Link
                 href={link.href}
-                className="hover:text-blue-300 transition-colors font-bold"
+                className={`text-sm font-semibold transition-colors ${
+                  isActive(link.href) ? "text-cyan-400" : "text-slate-300 hover:text-white"
+                }`}
               >
                 {link.label}
               </Link>
@@ -33,20 +42,28 @@ export default function Navbar() {
         </ul>
 
         <button
-          className="md:hidden text-2xl focus:outline-none"
+          className="md:hidden text-2xl text-slate-200 focus-ring rounded-lg p-1"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          aria-label="Toggle navigation menu"
+          aria-expanded={isMobileMenuOpen}
         >
-          ☰
+          {isMobileMenuOpen ? <HiOutlineX /> : <HiOutlineMenu />}
         </button>
       </div>
 
-      {isMobileMenuOpen && (
-        <ul className="md:hidden absolute top-full right-0 bg-gray-900 w-48 py-2 rounded shadow-md flex flex-col gap-2 px-4">
+      <div
+        className={`md:hidden overflow-hidden transition-[max-height] duration-300 ease-in-out border-t border-slate-800/80 ${
+          isMobileMenuOpen ? "max-h-64" : "max-h-0"
+        }`}
+      >
+        <ul className="flex flex-col px-4 py-2 bg-slate-950/95">
           {navLinks.map((link) => (
             <li key={link.href}>
               <Link
                 href={link.href}
-                className="hover:text-blue-300 transition-colors font-bold"
+                className={`block py-3 text-base font-semibold transition-colors ${
+                  isActive(link.href) ? "text-cyan-400" : "text-slate-300 hover:text-white"
+                }`}
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 {link.label}
@@ -54,7 +71,7 @@ export default function Navbar() {
             </li>
           ))}
         </ul>
-      )}
+      </div>
     </nav>
   );
 }

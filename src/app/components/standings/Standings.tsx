@@ -3,6 +3,9 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import Card from "../ui/Card";
+import SectionHeading from "../ui/SectionHeading";
+import { LoadingState, ErrorState, EmptyState } from "../ui/StateMessage";
 
 interface Team {
   teamId: string;
@@ -43,25 +46,17 @@ export default function Standings() {
     fetchStandings();
   }, []);
 
-  if (loading) {
-    return <p className="text-center text-slate-400">Loading standings...</p>;
-  }
-
-  if (error) {
-    return <p className="text-center text-red-500">{error}</p>;
-  }
-
-  if (teams.length === 0) {
-    return <p className="text-center text-slate-400">No standings available.</p>;
-  }
-
   return (
-    <section className="mt-10 px-2 sm:px-6">
-        <div className="bg-slate-900/80 backdrop-blur border border-slate-700/50 rounded-2xl shadow-2xl p-4 sm:p-6">
-        <h2 className="text-2xl sm:text-3xl font-bold mb-4 text-center bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
-          League Standings
-        </h2>
+    <Card className="p-4 sm:p-6">
+      <SectionHeading title="League Standings" />
 
+      {error ? (
+        <ErrorState message={error} />
+      ) : loading ? (
+        <LoadingState label="Loading standings..." />
+      ) : teams.length === 0 ? (
+        <EmptyState message="No standings available." />
+      ) : (
         <div className="overflow-x-auto">
           <table className="w-full text-sm sm:text-base text-slate-200">
             <thead className="border-b border-slate-700/50">
@@ -87,11 +82,11 @@ export default function Standings() {
                   </td>
 
                   <td className="py-3">
-                    <Link 
+                    <Link
                       href={`/team/${team.teamId}`}
                       className="flex items-center gap-4 hover:text-blue-400 transition-colors"
                     >
-                      <div className="relative w-[34px] h-[34px]">
+                      <div className="relative w-[34px] h-[34px] flex-shrink-0">
                         <Image
                           src={team.logo}
                           alt={team.name}
@@ -115,8 +110,7 @@ export default function Standings() {
             </tbody>
           </table>
         </div>
-
-      </div>
-    </section>
+      )}
+    </Card>
   );
 }

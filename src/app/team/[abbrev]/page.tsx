@@ -3,6 +3,10 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
+import { HiOutlineArrowLeft } from "react-icons/hi";
+import Card from "../../components/ui/Card";
+import { LoadingState, ErrorState } from "../../components/ui/StateMessage";
 
 type Player = {
     id: number;
@@ -48,8 +52,8 @@ export default function TeamPage() {
                 const responseData = await res.json();
                 setData(responseData);
                 setError(null);
-            } catch (e: any) {
-                setError(e?.message || "Unable to load roster");
+            } catch (e) {
+                setError(e instanceof Error ? e.message : "Unable to load roster");
                 setData(null);
             } finally {
                 setLoading(false);
@@ -57,100 +61,98 @@ export default function TeamPage() {
         })();
     }, [abbrev]);
 
-    if (loading) return <div className="max-w-6xl mx-auto p-4">Loading roster...</div>;
+    const content = (() => {
+        if (loading) return <LoadingState label="Loading roster..." />;
+        if (error) return <ErrorState message={error} />;
+        if (!data) return <ErrorState message="No roster data available." />;
 
-    if (error) return <div className="max-w-6xl mx-auto p-4 text-red-600">{error}</div>;
+        const { roster, team } = data;
 
-    if (!data) return <div className="max-w-6xl mx-auto p-4">No roster data available.</div>;
-
-    const { roster, team } = data;
-
-    const renderPlayerTable = (players: Player[], title: string) => (
-        <div className="mb-8">
-            <h2 className="text-2xl font-semibold mb-4">{title}</h2>
-            <div className="overflow-x-auto">
-                <table className="w-full border-separate border-spacing-y-2">
-                    <thead>
-                        <tr className="border-b-2 border-gray-300 dark:border-gray-700">
-                            <th className="text-left py-3 px-4">#</th>
-                            <th className="text-left py-3 px-4">Player</th>
-                            <th className="text-left py-3 px-4">Position</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {players.map((player) => (
-                            <tr
-                                key={player.id}
-                                className="bg-black/5 dark:bg-white/5 rounded-xl shadow-sm hover:shadow-lg hover:shadow-blue-500 transition-all duration-200"
-                            >
-                                <td className="py-3 px-4 font-semibold">
-                                    {player.sweaterNumber}
-                                </td>
-                                <td className="py-3 px-4">
-                                    <Link 
-                                        href={`/player/${player.id}`}
-                                        className="flex items-center gap-3 hover:text-blue-500 transition-colors"
+        const renderPlayerTable = (players: Player[], title: string) => (
+            <div className="mb-8">
+                <h2 className="text-xl font-bold text-white mb-4">{title}</h2>
+                <Card className="overflow-hidden">
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-sm sm:text-base">
+                            <thead>
+                                <tr className="border-b border-slate-800 text-left text-slate-400 text-xs uppercase tracking-wide">
+                                    <th className="py-3 px-4">#</th>
+                                    <th className="py-3 px-4">Player</th>
+                                    <th className="py-3 px-4">Pos</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {players.map((player) => (
+                                    <tr
+                                        key={player.id}
+                                        className="border-b border-slate-800/60 last:border-0 hover:bg-slate-800/40 transition-colors"
                                     >
-                                        {player.headshot && (
-                                            // eslint-disable-next-line @next/next/no-img-element
-                                            <img
-                                                src={player.headshot}
-                                                alt={`${player.firstName.default} ${player.lastName.default}`}
-                                                className="w-14 h-14 rounded-full object-cover"
-                                            />
-                                        )}
-                                        <span>
-                                            {player.firstName.default} {player.lastName.default}
-                                        </span>
-                                    </Link>
-                                </td>
-                                <td className="py-3 px-4">{player.positionCode}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+                                        <td className="py-3 px-4 font-semibold text-slate-300">
+                                            {player.sweaterNumber}
+                                        </td>
+                                        <td className="py-2 px-4">
+                                            <Link
+                                                href={`/player/${player.id}`}
+                                                className="flex items-center gap-3 hover:text-cyan-400 transition-colors"
+                                            >
+                                                {player.headshot && (
+                                                    <Image
+                                                        src={player.headshot}
+                                                        alt={`${player.firstName.default} ${player.lastName.default}`}
+                                                        width={44}
+                                                        height={44}
+                                                        className="rounded-full object-cover bg-slate-800 h-11 w-11"
+                                                    />
+                                                )}
+                                                <span className="font-medium text-slate-100">
+                                                    {player.firstName.default} {player.lastName.default}
+                                                </span>
+                                            </Link>
+                                        </td>
+                                        <td className="py-3 px-4 text-slate-400">{player.positionCode}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </Card>
             </div>
-        </div>
-    );
+        );
+
+        return (
+            <>
+                <div className="flex flex-col items-center text-center mb-10">
+                    {team?.logo && (
+                        <div className="relative h-28 w-28 sm:h-32 sm:w-32 mb-4">
+                            <Image src={team.logo} alt={`${team.name} logo`} fill className="object-contain" />
+                        </div>
+                    )}
+                    <h1 className="text-3xl sm:text-4xl font-extrabold text-white mb-2">
+                        {team?.name || abbrev.toUpperCase()}
+                    </h1>
+                    {team && (
+                        <p className="text-lg text-slate-400">
+                            {team.wins}-{team.losses}-{team.otLosses}
+                        </p>
+                    )}
+                </div>
+
+                {roster.forwards?.length > 0 && renderPlayerTable(roster.forwards, "Forwards")}
+                {roster.defensemen?.length > 0 && renderPlayerTable(roster.defensemen, "Defensemen")}
+                {roster.goalies?.length > 0 && renderPlayerTable(roster.goalies, "Goalies")}
+            </>
+        );
+    })();
 
     return (
-        <div className="max-w-6xl mx-auto p-4">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
             <Link
                 href="/teams"
-                className="text-blue-500 hover:text-blue-400 text-sm mb-6 inline-block"
+                className="inline-flex items-center gap-1.5 text-sm text-slate-400 hover:text-cyan-400 transition-colors mb-6"
             >
-                ← Back to Teams
+                <HiOutlineArrowLeft /> Back to Teams
             </Link>
-
-            <div className="flex flex-col items-center mb-8">
-                {team?.logo && (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                        src={team.logo}
-                        alt={`${team.name} logo`}
-                        className="h-32 w-32 object-contain mt-2"
-                    />
-                )}
-                <h1 className="text-4xl font-bold mb-6">
-                    {team?.name || abbrev.toUpperCase()}
-                </h1>
-                {team && (
-                    <p className="text-xl text-gray-600 dark:text-gray-400">
-                        {team.wins}-{team.losses}-{team.otLosses}
-                    </p>
-                )}
-            </div>
-
-            <div>
-                {roster.forwards && roster.forwards.length > 0 &&
-                    renderPlayerTable(roster.forwards, "Forwards")}
-
-                {roster.defensemen && roster.defensemen.length > 0 &&
-                    renderPlayerTable(roster.defensemen, "Defensemen")}
-
-                {roster.goalies && roster.goalies.length > 0 &&
-                    renderPlayerTable(roster.goalies, "Goalies")}
-            </div>
+            {content}
         </div>
     );
 }
