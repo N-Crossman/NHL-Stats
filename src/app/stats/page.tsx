@@ -130,6 +130,10 @@ export default function StatsPage() {
   const [defensemen, setDefensemen] = useState<DefensemanStats[]>([]);
   const [defensemenLoading, setDefensemenLoading] = useState(true);
 
+  const now = new Date();
+  const seasonStartYear = now.getMonth() >= 9 ? now.getFullYear() : now.getFullYear() - 1;
+  const seasonLabel = `${seasonStartYear}-${seasonStartYear + 1} Season`;
+
   useEffect(() => {
     const fetchStats = async () => {
       try {
@@ -180,7 +184,7 @@ export default function StatsPage() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
-      <SectionHeading title="Statistics" subtitle="2025-2026 Season" align="left" />
+      <SectionHeading title="Statistics" subtitle={seasonLabel} align="left" />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 mb-6 sm:mb-8">
         <Card className="p-5 sm:p-6">
