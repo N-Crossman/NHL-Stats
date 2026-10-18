@@ -14,6 +14,7 @@ export default function Navbar() {
         { href: "/teams", label: "Teams" },
         { href: "/players", label: "Players" },
         { href: "/stats", label: "Stats" },
+        { href: "/analytics", label: "Analytics" },
     ];
 
     const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname?.startsWith(href));
@@ -53,7 +54,7 @@ export default function Navbar() {
 
       <div
         className={`md:hidden overflow-hidden transition-[max-height] duration-300 ease-in-out border-t border-slate-800/80 ${
-          isMobileMenuOpen ? "max-h-64" : "max-h-0"
+          isMobileMenuOpen ? "max-h-80" : "max-h-0"
         }`}
       >
         <ul className="flex flex-col px-4 py-2 bg-slate-950/95">
