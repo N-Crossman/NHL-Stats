@@ -18,7 +18,7 @@ export default function Home () {
           Pucklytics
         </h1>
         <p className="text-slate-400 text-sm sm:text-base max-w-xl mx-auto">
-          Live scores, league standings, and player stats for every NHL game — all in one place.
+          Live scores, standings, and player stats, plus in-depth analytics that go beyond the box score.
         </p>
       </section>
 
