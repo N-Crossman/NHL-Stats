@@ -2,6 +2,7 @@ import SectionHeading from "../components/ui/SectionHeading";
 import PlayoffPace from "./PlayoffPace";
 import HomeRoadSplits from "./HomeRoadSplits";
 import SpecialTeams from "./SpecialTeams";
+import RollingForm from "./RollingForm";
 
 export default function AnalyticsPage() {
   return (
@@ -12,6 +13,7 @@ export default function AnalyticsPage() {
         <PlayoffPace />
         <HomeRoadSplits />
         <SpecialTeams />
+        <RollingForm />
       </div>
     </div>
   );

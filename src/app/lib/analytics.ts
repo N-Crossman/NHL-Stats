@@ -56,6 +56,42 @@ export type SpecialTeamsTeam = {
   penaltyKillPct: number;
 };
 
+export type GameResult = "W" | "L" | "OTL";
+
+export type TeamGame = {
+  gameId: number;
+  date: string;
+  opponent: string;
+  isHome: boolean;
+  /** Goals for/against from the final score (includes the shootout winner's goal, as standings do) */
+  goalsFor: number;
+  goalsAgainst: number;
+  result: GameResult;
+  /** "REG" | "OT" | "SO" */
+  decidedIn: string;
+};
+
+export type RollingFormPoint = TeamGame & {
+  game: number;
+  rollingGoalsFor: number;
+  rollingGoalsAgainst: number;
+  goalDifferential: number;
+};
+
+/** Per-game GF/GA averaged over the previous `window` games (including this one). */
+export function rollingForm(games: TeamGame[], window: number): RollingFormPoint[] {
+  return games.map((g, i) => {
+    const slice = games.slice(Math.max(0, i - window + 1), i + 1);
+    return {
+      ...g,
+      game: i + 1,
+      rollingGoalsFor: average(slice.map((s) => s.goalsFor)),
+      rollingGoalsAgainst: average(slice.map((s) => s.goalsAgainst)),
+      goalDifferential: g.goalsFor - g.goalsAgainst,
+    };
+  });
+}
+
 /** NHL season id for the season in progress, e.g. "20262027". Seasons roll over in October. */
 export function currentSeasonId(date = new Date()): string {
   const startYear = date.getMonth() >= 9 ? date.getFullYear() : date.getFullYear() - 1;
