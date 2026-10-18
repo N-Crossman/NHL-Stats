@@ -92,6 +92,46 @@ export function rollingForm(games: TeamGame[], window: number): RollingFormPoint
   });
 }
 
+export type GoalieStart = {
+  gameId: number;
+  date: string;
+  team: string;
+  opponent: string;
+  isHome: boolean;
+  shotsAgainst: number;
+  goalsAgainst: number;
+  /** "W" | "L" | "O" (overtime/shootout loss), or "" for no decision */
+  decision: string;
+};
+
+export type GoalieTrendPoint = GoalieStart & {
+  start: number;
+  savePct: number;
+  rollingSavePct: number;
+};
+
+/** Save % for a set of games, weighted by shots: 1 − GA / SA. */
+export function savePct(games: { shotsAgainst: number; goalsAgainst: number }[]): number {
+  const shots = games.reduce((sum, g) => sum + g.shotsAgainst, 0);
+  const goals = games.reduce((sum, g) => sum + g.goalsAgainst, 0);
+  return shots > 0 ? 1 - goals / shots : 0;
+}
+
+/** Per-start save % plus a shot-weighted rolling save % over the previous `window` starts. */
+export function rollingSavePct(starts: GoalieStart[], window: number): GoalieTrendPoint[] {
+  return starts.map((s, i) => ({
+    ...s,
+    start: i + 1,
+    savePct: savePct([s]),
+    rollingSavePct: savePct(starts.slice(Math.max(0, i - window + 1), i + 1)),
+  }));
+}
+
+/** Formats save % the way the NHL does: .915 */
+export function formatSavePct(value: number): string {
+  return value >= 1 ? "1.000" : value.toFixed(3).replace(/^0/, "");
+}
+
 /** NHL season id for the season in progress, e.g. "20262027". Seasons roll over in October. */
 export function currentSeasonId(date = new Date()): string {
   const startYear = date.getMonth() >= 9 ? date.getFullYear() : date.getFullYear() - 1;

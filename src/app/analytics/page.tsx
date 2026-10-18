@@ -3,6 +3,7 @@ import PlayoffPace from "./PlayoffPace";
 import HomeRoadSplits from "./HomeRoadSplits";
 import SpecialTeams from "./SpecialTeams";
 import RollingForm from "./RollingForm";
+import GoalieTrends from "./GoalieTrends";
 
 export default function AnalyticsPage() {
   return (
@@ -14,6 +15,7 @@ export default function AnalyticsPage() {
         <HomeRoadSplits />
         <SpecialTeams />
         <RollingForm />
+        <GoalieTrends />
       </div>
     </div>
   );
