@@ -1,11 +1,14 @@
 import SectionHeading from "../components/ui/SectionHeading";
-import { EmptyState } from "../components/ui/StateMessage";
+import PlayoffPace from "./PlayoffPace";
 
 export default function AnalyticsPage() {
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
       <SectionHeading title="Analytics" subtitle="Projections & trends" align="left" />
-      <EmptyState message="Charts coming soon." />
+
+      <div className="flex flex-col gap-6 sm:gap-8">
+        <PlayoffPace />
+      </div>
     </div>
   );
 }
