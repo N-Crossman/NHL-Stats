@@ -1,6 +1,7 @@
 import SectionHeading from "../components/ui/SectionHeading";
 import PlayoffPace from "./PlayoffPace";
 import HomeRoadSplits from "./HomeRoadSplits";
+import SpecialTeams from "./SpecialTeams";
 
 export default function AnalyticsPage() {
   return (
@@ -10,6 +11,7 @@ export default function AnalyticsPage() {
       <div className="flex flex-col gap-6 sm:gap-8">
         <PlayoffPace />
         <HomeRoadSplits />
+        <SpecialTeams />
       </div>
     </div>
   );

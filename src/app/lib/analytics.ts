@@ -45,6 +45,32 @@ export type PlayoffPaceTeam = StandingsTeam & {
   cutoffPace: number;
 };
 
+export type SpecialTeamsTeam = {
+  abbrev: string;
+  name: string;
+  logo: string;
+  conference: Conference;
+  gamesPlayed: number;
+  /** Fractions, e.g. 0.214 */
+  powerPlayPct: number;
+  penaltyKillPct: number;
+};
+
+/** NHL season id for the season in progress, e.g. "20262027". Seasons roll over in October. */
+export function currentSeasonId(date = new Date()): string {
+  const startYear = date.getMonth() >= 9 ? date.getFullYear() : date.getFullYear() - 1;
+  return `${startYear}${startYear + 1}`;
+}
+
+/** Lowercases and strips accents so "Montréal Canadiens" matches "Montreal Canadiens". */
+export function normalizeTeamName(name: string): string {
+  return name.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
+}
+
+export function average(values: number[]): number {
+  return values.length ? values.reduce((sum, v) => sum + v, 0) / values.length : 0;
+}
+
 /** Points per game extrapolated to a full season. */
 export function projectPoints(points: number, gamesPlayed: number): number {
   if (gamesPlayed <= 0) return 0;
