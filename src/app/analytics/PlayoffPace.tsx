@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   Bar,
   BarChart,
@@ -22,6 +22,7 @@ import {
   type Conference,
   type PlayoffPaceTeam,
 } from "../lib/analytics";
+import { useAnalyticsStandings } from "./useAnalyticsStandings";
 
 const ABOVE_COLOR = "#3987e5";
 const BELOW_COLOR = "#e66767";
@@ -61,26 +62,8 @@ function PaceTooltip({ team }: { team: PlayoffPaceTeam }) {
 }
 
 export default function PlayoffPace() {
-  const [teams, setTeams] = useState<PlayoffPaceTeam[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { teams, loading, error } = useAnalyticsStandings();
   const [conference, setConference] = useState<Conference>("E");
-
-  useEffect(() => {
-    (async () => {
-      try {
-        const res = await fetch("/api/analytics/standings");
-        if (!res.ok) throw new Error("Unable to load standings");
-        const json = await res.json();
-        setTeams(json.teams ?? []);
-        setError(null);
-      } catch (e) {
-        setError(e instanceof Error ? e.message : "Unable to load standings");
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, []);
 
   const rows = useMemo(
     () => teams.filter((t) => t.conference === conference).sort((a, b) => b.gapPace - a.gapPace),

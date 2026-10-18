@@ -85,6 +85,17 @@ export function withPlayoffPace(teams: StandingsTeam[]): PlayoffPaceTeam[] {
   });
 }
 
+/** Points earned as a share of points available (2 per game). Null until a game is played. */
+export function pointsPct(split: { points: number; gamesPlayed: number }): number | null {
+  if (split.gamesPlayed <= 0) return null;
+  return split.points / (split.gamesPlayed * 2);
+}
+
+/** Formats a W-L-OT record, e.g. "5-1-0" */
+export function formatRecord(r: { wins: number; losses: number; otLosses: number }): string {
+  return `${r.wins}-${r.losses}-${r.otLosses}`;
+}
+
 /** Playoff position, e.g. "Pacific #2", "Wild card 1", "Outside". */
 export function playoffPositionLabel(t: StandingsTeam): string {
   if (t.wildcardSequence === 0) return `${t.divisionName} #${t.divisionSequence}`;
