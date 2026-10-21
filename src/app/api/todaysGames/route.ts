@@ -2,9 +2,11 @@ import { NextResponse } from 'next/server';
 
 export async function GET() {
   try {
-    const today = new Date().toISOString().split("T")[0];
-    const response = await fetch(`https://api-web.nhle.com/v1/score/${today}`);
+    // "now" returns the NHL's current game day, which doesn't roll over at UTC midnight
+    // like toISOString() does, so evening games stay on the right day
+    const response = await fetch("https://api-web.nhle.com/v1/score/now", { cache: "no-store" });
     const data = await response.json();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const games = (data.games || []).map((game: any) => ({
       gamePk: game.id,
       gameDate: game.startTimeUTC,
@@ -34,7 +36,7 @@ export async function GET() {
       status: game.gameState,
     }));
     
-    return NextResponse.json({ games });
+    return NextResponse.json({ date: data.currentDate ?? null, games });
   } catch {
     return NextResponse.json({ error: "Unable to fetch today's games" }, { status: 500 });
   }
