@@ -1,6 +1,6 @@
 /** Pure helpers for the Analytics page. API routes shape the data, these do the math. */
 
-export const SEASON_GAMES = 82;
+export const SEASON_GAMES = 84;
 
 export type Conference = "E" | "W";
 
